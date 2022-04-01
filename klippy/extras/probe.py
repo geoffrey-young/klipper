@@ -165,6 +165,8 @@ class PrinterProbe:
             # Probe position
             pos = self._probe(speed)
             positions.append(pos)
+            # Retract
+            self._move(probexy + [pos[2] + sample_retract_dist], lift_speed)
             # Check samples tolerance
             z_positions = [p[2] for p in positions]
             if max(z_positions) - min(z_positions) > samples_tolerance:
@@ -173,9 +175,6 @@ class PrinterProbe:
                 gcmd.respond_info("Probe samples exceed tolerance. Retrying...")
                 retries += 1
                 positions = []
-            # Retract
-            if len(positions) < sample_count:
-                self._move(probexy + [pos[2] + sample_retract_dist], lift_speed)
         if must_notify_multi_probe:
             self.multi_probe_end()
         # Calculate and return result
